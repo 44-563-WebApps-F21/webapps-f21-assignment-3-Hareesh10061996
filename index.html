@@ -91,3 +91,225 @@ https://github.com/44-563-WebApps-F21/webapps-f21-assignment-3-Hareesh10061996/b
 
 </body>
 </html>
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Demo</title>
+</head>
+<body>
+
+<h1>Code fencing </h1>
+<P>Search for a pair of intersecting segments<br>
+const double EPS = 1E-9;<br>
+
+struct pt {<br>
+    double x, y;<br>
+};<br>
+
+struct seg {<br>
+    pt p, q;<br>
+    int id;<br>
+
+    double get_y(double x) const {<br>
+        if (abs(p.x - q.x) < EPS)<br>
+            return p.y;<br>
+        return p.y + (q.y - p.y) * (x - p.x) / (q.x - p.x);<br>
+    }<br>
+};<br>
+
+bool intersect1d(double l1, double r1, double l2, double r2) {<br>
+    if (l1 > r1)<br>
+        swap(l1, r1);<br>
+    if (l2 > r2)<br>
+        swap(l2, r2);<br>
+    return max(l1, l2) <= min(r1, r2) + EPS;<br>
+}<br>
+
+int vec(const pt& a, const pt& b, const pt& c) {<br>
+    double s = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);<br>
+    return abs(s) < EPS ? 0 : s > 0 ? +1 : -1;<br>
+}<br>
+
+bool intersect(const seg& a, const seg& b)<br>
+{<br>
+    return intersect1d(a.p.x, a.q.x, b.p.x, b.q.x) &&<br>
+           intersect1d(a.p.y, a.q.y, b.p.y, b.q.y) &&<br>
+           vec(a.p, a.q, b.p) * vec(a.p, a.q, b.q) <= 0 &&<br>
+           vec(b.p, b.q, a.p) * vec(b.p, b.q, a.q) <= 0;<br>
+}<br>
+
+bool operator<(const seg& a, const seg& b) <br>
+{<br>
+    double x = max(min(a.p.x, a.q.x), min(b.p.x, b.q.x));<br>
+    return a.get_y(x) < b.get_y(x) - EPS;<br>
+}<br>
+
+struct event {<br>
+    double x;<br>
+    int tp, id;<br>
+<br>
+    event() {}<br>
+    event(double x, int tp, int id) : x(x), tp(tp), id(id) {}<br>
+
+    bool operator<(const event& e) const {<br>
+        if (abs(x - e.x) > EPS)<br>
+            return x < e.x;<br>
+        return tp > e.tp;<br>
+    }<br>
+};<br>
+
+set<seg> s;<br>
+vector<set<seg>::iterator> where;<br>
+
+set<seg>::iterator prev(set<seg>::iterator it) {<br>
+    return it == s.begin() ? s.end() : --it;<br>
+}<br>
+
+set<seg>::iterator next(set<seg>::iterator it) {<br>
+    return ++it;<br>
+}<br>
+
+pair<int, int> solve(const vector<seg>& a) {<br>
+    int n = (int)a.size();<br>
+    vector<event> e;<br>
+    for (int i = 0; i < n; ++i) {<br>
+        e.push_back(event(min(a[i].p.x, a[i].q.x), +1, i));<br>
+        e.push_back(event(max(a[i].p.x, a[i].q.x), -1, i));<br><br>
+    }
+    sort(e.begin(), e.end());<br>
+
+    s.clear();<br>
+    where.resize(a.size());<br>
+    for (size_t i = 0; i < e.size(); ++i) {<br>
+        int id = e[i].id;<br>
+        if (e[i].tp == +1) {<br>
+            set<seg>::iterator nxt = s.lower_bound(a[id]), prv = prev(nxt);<br>
+            if (nxt != s.end() && intersect(*nxt, a[id]))<br>
+                return make_pair(nxt->id, id);<br>
+            if (prv != s.end() && intersect(*prv, a[id]))<br>
+                return make_pair(prv->id, id);<br>
+            where[id] = s.insert(nxt, a[id]);<br>
+        } else {<br><br>
+            set<seg>::iterator nxt = next(where[id]), prv = prev(where[id]);<br>
+            if (nxt != s.end() && prv != s.end() && intersect(*nxt, *prv))<br>
+                return make_pair(prv->id, nxt->id);<br>
+            s.erase(where[id]);<br>
+        }<br>
+    }<br>
+
+    return make_pair(-1, -1);<br>
+}<br>
+
+<P><br>
+
+const double EPS = 1E-9;<br>
+
+struct pt {<br>
+    double x, y;<br><br>
+};<br>
+
+struct seg {<br>
+    pt p, q;<br>
+    int id;<br>
+
+    double get_y(double x) const {<br>
+        if (abs(p.x - q.x) < EPS)<br>
+            return p.y;
+        return p.y + (q.y - p.y) * (x - p.x) / (q.x - p.x);<br>
+    }<br>
+};<br><br>
+
+bool intersect1d(double l1, double r1, double l2, double r2) {<br>
+    if (l1 > r1)<br>
+        swap(l1, r1);<br>
+    if (l2 > r2)<br>
+        swap(l2, r2);<br>
+    return max(l1, l2) <= min(r1, r2) + EPS;<br>
+}<br>
+
+int vec(const pt& a, const pt& b, const pt& c) {<br>
+    double s = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);<br>
+    return abs(s) < EPS ? 0 : s > 0 ? +1 : -1;<br>
+}<br>
+
+bool intersect(const seg& a, const seg& b)<br>
+{<br>
+    return intersect1d(a.p.x, a.q.x, b.p.x, b.q.x) &&<br>
+           intersect1d(a.p.y, a.q.y, b.p.y, b.q.y) &&<br>
+           vec(a.p, a.q, b.p) * vec(a.p, a.q, b.q) <= 0 &&<br>
+           vec(b.p, b.q, a.p) * vec(b.p, b.q, a.q) <= 0;<br>
+}<br>
+
+bool operator<(const seg& a, const seg& b)<br>
+{
+    double x = max(min(a.p.x, a.q.x), min(b.p.x, b.q.x));<br>
+    return a.get_y(x) < b.get_y(x) - EPS;<br>
+}<br>
+
+struct event {<br>
+    double x;<br>
+    int tp, id;<br>
+
+    event() {}<br>
+    event(double x, int tp, int id) : x(x), tp(tp), id(id) {}<br>
+
+    bool operator<(const event& e) const {<br>
+        if (abs(x - e.x) > EPS)<br><br>
+            return x < e.x;<br>
+        return tp > e.tp;<br>
+    }<br><br>
+};<br>
+
+set<seg> s;<br>
+vector<set<seg>::iterator> where;<br>
+
+set<seg>::iterator prev(set<seg>::iterator it) {<br>
+    return it == s.begin() ? s.end() : --it;<br>
+}<br>
+
+set<seg>::iterator next(set<seg>::iterator it) {<br><br><br>
+    return ++it;<br><br>
+}<br>
+
+pair<int, int> solve(const vector<seg>& a) {<br>
+    int n = (int)a.size();<br>
+    vector<event> e;<br>
+    for (int i = 0; i < n; ++i) {<br>
+        e.push_back(event(min(a[i].p.x, a[i].q.x), +1, i));<br>
+        e.push_back(event(max(a[i].p.x, a[i].q.x), -1, i));<br><br>
+    }<br>
+    sort(e.begin(), e.end());<br>
+
+    s.clear();<br>
+    where.resize(a.size());<br>
+    for (size_t i = 0; i < e.size(); ++i) {<br>
+        int id = e[i].id;<br>
+        if (e[i].tp == +1) {<br>
+            set<seg>::iterator nxt = s.lower_bound(a[id]), prv = prev(nxt);<br>
+            if (nxt != s.end() && intersect(*nxt, a[id]))<br><br>
+                return make_pair(nxt->id, id);<br>
+            if (prv != s.end() && intersect(*prv, a[id]))<br>
+                return make_pair(prv->id, id);<br>
+            where[id] = s.insert(nxt, a[id]);<br>
+        } else {<br>
+            set<seg>::iterator nxt = next(where[id]), prv = prev(where[id]);<br>
+            if (nxt != s.end() && prv != s.end() && intersect(*nxt, *prv))<br>
+                return make_pair(prv->id, nxt->id);<br>
+            s.erase(where[id]);<br>
+        }<br><br><br>
+    }<br><br>
+
+    return make_pair(-1, -1);<br>
+}<br>
+
+<P>
+      
+
+</body>
+</html>
+
+
+
